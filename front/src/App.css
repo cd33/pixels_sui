@@ -1,0 +1,26 @@
+* {
+  font-family: "Courier New", Courier, monospace;
+}
+
+h1,
+p {
+  margin: 0;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #b7461d);
+}
+.logo.pixels:hover {
+  filter: drop-shadow(0 0 2em #e45527);
+}

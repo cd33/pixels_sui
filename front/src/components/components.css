@@ -1,0 +1,13 @@
+canvas,
+.loading_canvas {
+  width: 800px;
+  height: 800px;
+}
+
+@media (max-width: 800px) {
+  canvas,
+  .loading_canvas {
+    width: 100%;
+    height: auto;
+  }
+}

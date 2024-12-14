@@ -84,6 +84,7 @@ if (published_event?.type != "published") {
 
 const package_id = published_event.packageId;
 const board_type = `${package_id}::board::Board`;
+const admin_cap_type = `${package_id}::board::AdminCap`;
 
 const board_id = find_one_by_type(objectChanges, board_type);
 if (!board_id) {
@@ -91,12 +92,16 @@ if (!board_id) {
   process.exit(1);
 }
 
+const admin_cap_id = find_one_by_type(objectChanges, admin_cap_type);
+if (!admin_cap_id) {
+  console.log("Error: Could not find AdminCap creation in results of publish");
+  process.exit(1);
+}
+
 let deployed_addresses = {
-  types: {
-    BOARD: board_type,
-  },
   PACKAGE_ID: package_id,
   BOARD: board_id,
+  ADMIN_CAP: admin_cap_id,
 };
 console.log("deployed_addresses", deployed_addresses);
 
@@ -105,7 +110,6 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 await wait(5000);
 
 const read_quadrant_trx = new TransactionBlock();
-console.log("read_quadrant_trx", read_quadrant_trx);
 read_quadrant_trx.moveCall({
   target: `${package_id}::board::get_quadrants`,
   arguments: [read_quadrant_trx.object(board_id)],
@@ -122,8 +126,9 @@ if (!quadrants || quadrants.length != 129) {
   process.exit(1);
 }
 
+const [, ...bytes] = quadrants;
 const chunked_address_bytes = Array.from({ length: 4 }).map((_, i) =>
-  quadrants.slice(i * 32, (i + 1) * 32)
+  bytes.slice(i * 32, (i + 1) * 32)
 );
 const addresses = chunked_address_bytes.map(
   (address_bytes) =>

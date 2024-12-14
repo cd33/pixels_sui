@@ -12,6 +12,36 @@ body {
   margin: 0;
 }
 
+.container {
+  display: flex;
+  justify-content: center;
+  margin-top: 4rem;
+}
+
+@media (max-width: 1200px) {
+  .container {
+    flex-direction: column;
+  }
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin: 4rem;
+}
+
+.board {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  margin-bottom: 4rem;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -23,4 +53,26 @@ body {
 }
 .logo.pixels:hover {
   filter: drop-shadow(0 0 2em #e45527);
+}
+
+.paused_canvas {
+  width: 800px;
+  height: 800px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid black;
+  text-align: center;
+}
+
+@media (max-width: 800px) {
+  paused_canvas {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid black;
+    text-align: center;
+  }
 }

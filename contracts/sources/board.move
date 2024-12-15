@@ -1,14 +1,19 @@
 module pixels::board {
     use sui::object::{new, uid_to_address};
     use sui::dynamic_object_field;
-    use sui::transfer::{transfer, share_object};
+    use sui::transfer::{transfer, share_object, public_transfer};
+    use sui::coin::{Coin, value};
+    use sui::sui::SUI;
 
     const EInvalidCoord: u64 = 0;
     const EPaused: u64 = 1;
+    const EInsufficientFunds: u64 = 2;
 
     public struct Board has key, store {
         id: UID,
-        paused: bool
+        paused: bool,
+        receiver: address,
+        price: u64
     }
 
     public struct AdminCap has key, store {
@@ -24,7 +29,9 @@ module pixels::board {
     fun init(ctx: &mut TxContext) {
         let mut board = Board {
             id: new(ctx),
-            paused: true
+            paused: true,
+            receiver: ctx.sender(),
+            price: 100_000_000, // (0.1 SUI)
         };
 
         let mut i = 0;
@@ -87,9 +94,13 @@ module pixels::board {
         addresses
     }
 
-    public fun set_pixel(board: &mut Board, x: u64, y: u64, color: u32) {
+    public fun set_pixel(board: &mut Board, x: u64, y: u64, color: u32, payment: Coin<SUI>) {
         assert!(!board.paused, EPaused);
         assert!(x < 400 && y < 400, EInvalidCoord);
+        assert!(value(&payment) >= board.price, EInsufficientFunds);
+
+        public_transfer(payment, board.receiver);
+
         let quadrant_id = get_quadrant_id(x,y);
         let quadrant: &mut Quadrant = dynamic_object_field::borrow_mut(&mut board.id, quadrant_id);
         let pixel: &mut u32 = vector::borrow_mut(
@@ -101,5 +112,13 @@ module pixels::board {
 
     public fun set_pause(_: &AdminCap, board: &mut Board) {
         board.paused = !board.paused
+    }
+
+    public fun set_price(_: &AdminCap, board: &mut Board, new_price: u64) {
+        board.price = new_price;
+    }
+
+    public fun set_receiver(_: &AdminCap, board: &mut Board, new_receiver: address) {
+        board.receiver = new_receiver;
     }
 }

@@ -5,7 +5,8 @@ import {
 } from "@mysten/sui.js/client";
 import { useEffect, useState } from "react";
 
-const rpcUrl = getFullnodeUrl("devnet");
+const NETWORK = import.meta.env.VITE_NETWORK;
+const rpcUrl = getFullnodeUrl(NETWORK);
 const client = new SuiClient({ url: rpcUrl });
 
 export const useQuadrantResponses = (addresses: string[], interval: number) => {

@@ -38,6 +38,22 @@ Pour connecter le client Sui à un réseau, suivez les étapes ci-dessous :
 
 5. Copiez la clé `bech32WithFlag` dans Suiet (extension de portefeuille Sui pour Chrome).
 
+## Démarrer un local network
+
+Pour démarrer un réseau local, exécutez la commande suivante :
+
+```sh
+RUST_LOG="off,sui_node=info" sui start --with-faucet --force-regenesis
+```
+
+Pour configurer un environnement local, exécutez les commandes suivantes :
+
+```sh
+sui client new-env --alias local --rpc http://127.0.0.1:9000
+sui client switch --env local
+sui client faucet
+```
+
 ## Ressources supplémentaires
 
 - [Guide de démarrage pour les développeurs Sui](https://docs.sui.io/guides/developer/getting-started/connect)

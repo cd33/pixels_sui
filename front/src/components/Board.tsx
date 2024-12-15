@@ -5,7 +5,7 @@ import { useQuadrantResponses } from "../utils/hooks";
 import Quadrant from "./Quadrant";
 import "./components.css";
 
-const Board = ({ color }: { color: string }) => {
+const Board = ({ color, price }: { color: string; price: number }) => {
   const quadrant_responses = useQuadrantResponses(QUADRANT_ADDRESSES, 5);
   if (quadrant_responses.length === 0 || !quadrant_responses.every((x) => x)) {
     return (
@@ -34,7 +34,7 @@ const Board = ({ color }: { color: string }) => {
     <TransformWrapper>
       <div style={{ border: "1px solid black", width: "fit-content" }}>
         <TransformComponent>
-          <Quadrant quadrants={quadrants} color={color} />
+          <Quadrant quadrants={quadrants} color={color} price={price} />
         </TransformComponent>
       </div>
     </TransformWrapper>

@@ -4,7 +4,12 @@ import { CompactPicker } from "react-color";
 import "./App.css";
 import Board from "./components/Board";
 import pixelsLogo from "./logo.svg";
-import { get_pause_status, get_set_pause_tx } from "./utils/functions";
+import {
+  get_datas,
+  get_set_pause_tx,
+  get_set_price_tx,
+  get_set_receiver_tx,
+} from "./utils/functions";
 
 const ADMIN_WALLET_ADDRESS = import.meta.env.VITE_ADMIN_WALLET_ADDRESS;
 
@@ -12,13 +17,17 @@ function App() {
   const { status, wallet } = ethos.useWallet();
   const [color, set_color] = useState("#000");
   const [paused, setPaused] = useState<boolean | null>(null);
+  const [price, setPrice] = useState<number | null>(null);
+  const [newPrice, setNewPrice] = useState<number>(0);
+  const [newReceiver, setNewReceiver] = useState<string>("");
   const idAdmin = wallet?.address === ADMIN_WALLET_ADDRESS;
 
   useEffect(() => {
     const fetchPauseStatus = async () => {
       try {
-        const res = await get_pause_status();
-        setPaused(res);
+        const res = await get_datas();
+        setPaused(res.pause);
+        setPrice(res.price);
       } catch (error) {
         console.error("Error fetching pause status:", error);
       }
@@ -36,6 +45,13 @@ function App() {
         <h1>Pixels</h1>
         <p style={{ marginTop: "4rem", marginBottom: "4rem" }}>
           Select a color then click to place the pixel in the window.
+          {price && (
+            <>
+              <br />
+              <br />
+              Placing a pixel costs {price / 1000000000} SUI.
+            </>
+          )}
         </p>
         <CompactPicker
           color={color}
@@ -68,16 +84,52 @@ function App() {
           <p>Thanks mattjurenka for your tuto</p>
         </a>
         {idAdmin && (
-          <button
-            style={{ marginTop: "4rem" }}
-            onClick={() =>
-              wallet?.signAndExecuteTransactionBlock({
-                transactionBlock: get_set_pause_tx(),
-              })
-            }
-          >
-            Set Pause
-          </button>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <h2 style={{ marginTop: "1rem" }}>ADMIN</h2>
+            <button
+              onClick={() =>
+                wallet?.signAndExecuteTransactionBlock({
+                  transactionBlock: get_set_pause_tx(),
+                })
+              }
+            >
+              Set Pause
+            </button>
+            <div>
+              <input
+                type="number"
+                placeholder="New Price"
+                onChange={(e) => setNewPrice(parseInt(e.target.value))}
+              />
+              <button
+                style={{ marginTop: "1rem" }}
+                onClick={() =>
+                  wallet?.signAndExecuteTransactionBlock({
+                    transactionBlock: get_set_price_tx(newPrice),
+                  })
+                }
+              >
+                Set Price
+              </button>
+            </div>
+            <div>
+              <input
+                type="text"
+                placeholder="New Receiver"
+                onChange={(e) => setNewReceiver(e.target.value)}
+              />
+              <button
+                style={{ marginTop: "1rem" }}
+                onClick={() =>
+                  wallet?.signAndExecuteTransactionBlock({
+                    transactionBlock: get_set_receiver_tx(newReceiver),
+                  })
+                }
+              >
+                Set Receiver
+              </button>
+            </div>
+          </div>
         )}
       </div>
       <div className="board">
@@ -87,7 +139,7 @@ function App() {
             <p>Pixel placement is currently paused. Please try again later.</p>
           </div>
         ) : (
-          <Board color={color} />
+          <Board color={color} price={price ?? 0} />
         )}
       </div>
     </div>

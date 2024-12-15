@@ -9,7 +9,10 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <EthosConnectProvider
       ethosConfiguration={{
-        chain: Chain.SUI_DEVNET,
+        chain:
+          import.meta.env.VITE_NETWORK === "devnet"
+            ? Chain.SUI_DEVNET
+            : Chain.SUI_CUSTOM,
         network: NETWORK_URL,
       }}
     >

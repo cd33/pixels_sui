@@ -4,13 +4,16 @@ import { BOARD, PACKAGE_ID } from "../deployed_addresses.json";
 import { get_set_pixel_tx } from "../utils/functions";
 import "./components.css";
 
+const NETWORK = import.meta.env.VITE_NETWORK;
+
 export interface QuadrantProps {
   quadrants: [number[][], string][];
   color: string;
+  price: number;
 }
 
 const Quadrant = memo(
-  ({ quadrants, color }: QuadrantProps) => {
+  ({ quadrants, color, price }: QuadrantProps) => {
     const ref = useRef<HTMLCanvasElement>(null);
     const { wallet } = ethos.useWallet();
 
@@ -76,7 +79,7 @@ const Quadrant = memo(
             wallet.requestPreapproval({
               objectId: BOARD,
               totalGasLimit: 1_000_000_000,
-              chain: Chain.SUI_DEVNET,
+              chain: NETWORK === "devnet" ? Chain.SUI_DEVNET : Chain.SUI_CUSTOM,
               target: `${PACKAGE_ID}::board::set_pixel`,
               description: "",
               perTransactionGasLimit: 1_000_000_000,
@@ -86,7 +89,8 @@ const Quadrant = memo(
               transactionBlock: get_set_pixel_tx(
                 x,
                 y,
-                parseInt(color.replace("#", ""), 16)
+                parseInt(color.replace("#", ""), 16),
+                price
               ),
             });
           }
